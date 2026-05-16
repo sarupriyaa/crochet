@@ -9,6 +9,8 @@
 <title>About Us</title>
 
 <link rel="stylesheet" href="about.css">
+<link rel="stylesheet" href="navbar.css">
+<link rel="stylesheet" href="../search/search.css">
 
 </head>
 

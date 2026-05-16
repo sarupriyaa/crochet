@@ -21,6 +21,8 @@ if (!$result) {
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="decor.css">
     <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../navbar.css">
+    <link rel="stylesheet" href="../search/search.css">
 
     <style>
         .decor-section {

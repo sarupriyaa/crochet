@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <div class="footer-box">
             <h2 class="footer-logo">DaisyHook</h2>
 
-            <div class="footer-account">
+            <!-- <div class="footer-account">
 
                 <?php if (!isset($_SESSION["role"])): ?>
                     <a href="/crochet/login.php" class="footer-btn">Sign In</a>
@@ -36,7 +36,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
                 <?php endif; ?>
 
-            </div>
+            </div> -->
 
             <div class="footer-contact">
                 <p><i class="fa-regular fa-envelope"></i> daisyhook123gmail.com</p>
@@ -80,15 +80,17 @@ if (session_status() === PHP_SESSION_NONE) {
         </div>
 
         <!-- Social -->
-        <div class="footer-box social-box">
+        <!-- <div class="footer-box social-box">
             <h3>Follow Us</h3>
             <div class="social-icons">
-                <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-facebook-f"></i></a> -->
+                <!-- <a href="#"><i class="fa-brands fa-instagram"></i></a>
                 <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
                 <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedIn"></i></a>
+
             </div>
-        </div>
+        </div> -->
 
     </div>
 

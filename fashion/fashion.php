@@ -5,7 +5,6 @@ ini_set("display_errors", 1);
 
 include "../db.php";
 
-/* Check ID */
 if (!isset($_GET['id'])) {
     header("Location: fashions.php");
     exit();
@@ -13,27 +12,16 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 
-/* Get fashion item */
 $stmt = $conn->prepare("SELECT * FROM fashion WHERE id = ?");
-if (!$stmt) {
-    die("Prepare failed (product): " . $conn->error);
-}
-
 $stmt->bind_param("i", $id);
-
-if (!$stmt->execute()) {
-    die("Execute failed (product): " . $stmt->error);
-}
-
-$result = $stmt->get_result();
-$product = $result->fetch_assoc();
+$stmt->execute();
+$product = $stmt->get_result()->fetch_assoc();
 
 if (!$product) {
     echo "Fashion item not found";
     exit();
 }
 
-/* Related items */
 $related = $conn->prepare(
     "SELECT id, title, fashions, price 
      FROM fashion
@@ -41,30 +29,21 @@ $related = $conn->prepare(
      ORDER BY RAND() LIMIT 10"
 );
 
-if (!$related) {
-    die("Prepare failed (related): " . $conn->error);
-}
-
-$category = isset($product['category']) ? $product['category'] : '';
-
+$category = $product['category'] ?? '';
 $related->bind_param("si", $category, $id);
-
-if (!$related->execute()) {
-    die("Execute failed (related): " . $related->error);
-}
-
+$related->execute();
 $relatedResult = $related->get_result();
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($product['title']); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="fashion.css">
     <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../navbar.css">
 
     <style>
         a {
@@ -87,36 +66,6 @@ $relatedResult = $related->get_result();
             margin-top: 20px;
             flex-wrap: wrap;
         }
-
-        .cart-btn,
-        .wishlist-btn {
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .cart-btn a,
-        .wishlist-btn a {
-            color: white;
-            display: block;
-        }
-
-        .cart-btn {
-            background: #ff6b6b;
-        }
-
-        .wishlist-btn {
-            background: #e91e63;
-        }
-
-        .cart-btn:hover {
-            background: #ff5252;
-        }
-
-        .wishlist-btn:hover {
-            background: #d81b60;
-        }
     </style>
 </head>
 
@@ -130,14 +79,14 @@ $relatedResult = $related->get_result();
         <div class="product-image">
             <?php
             $mainImage = isset($product['fashions']) ? trim($product['fashions']) : '';
-            $mainFile = __DIR__ . "/../fashion/" . $mainImage;
-            $mainSrc  = "../fashion/" . $mainImage;
+            $mainFile = __DIR__ . "/../fashions/" . $mainImage;
+            $mainSrc  = "../fashions/" . $mainImage;
             ?>
 
             <?php if (!empty($mainImage) && file_exists($mainFile)): ?>
                 <img src="<?php echo htmlspecialchars($mainSrc); ?>" alt="Fashion">
             <?php else: ?>
-                <img src="../fashion/default.png" alt="No Image">
+                <img src="../fashions/default.png" alt="No Image">
             <?php endif; ?>
         </div>
 
@@ -181,25 +130,23 @@ $relatedResult = $related->get_result();
 <hr>
 
 <section class="double-product">
-
     <h3>You may also like</h3>
 
     <div class="related-grid">
-
         <?php while($row = $relatedResult->fetch_assoc()): ?>
             <div class="related-card">
                 <a href="fashion.php?id=<?php echo $row['id']; ?>">
 
                     <?php
                     $relatedImage = isset($row['fashions']) ? trim($row['fashions']) : '';
-                    $relatedFile = __DIR__ . "/../fashion/" . $relatedImage;
-                    $relatedSrc  = "../fashion/" . $relatedImage;
+                    $relatedFile = __DIR__ . "/../fashions/" . $relatedImage;
+                    $relatedSrc  = "../fashions/" . $relatedImage;
                     ?>
 
                     <?php if (!empty($relatedImage) && file_exists($relatedFile)): ?>
                         <img src="<?php echo htmlspecialchars($relatedSrc); ?>" alt="Related">
                     <?php else: ?>
-                        <img src="../fashion/default.png" alt="No Image">
+                        <img src="../fashions/default.png" alt="No Image">
                     <?php endif; ?>
 
                     <h4><?php echo htmlspecialchars($row['title']); ?></h4>
@@ -208,9 +155,7 @@ $relatedResult = $related->get_result();
                 </a>
             </div>
         <?php endwhile; ?>
-
     </div>
-
 </section>
 
 <?php include "../footer.php"; ?>

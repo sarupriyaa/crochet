@@ -5,13 +5,32 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 
 <link rel="stylesheet" href="/crochet/style.css">
+<link rel="stylesheet" href="/crochet/search/search.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="/crochet/navbar.js" defer></script>
 
-<nav class="navbar" id="navbar">
+<div class="top-header">
+    <div class="top-header-inner">
 
-    <div class="logo">
-        <a href="/crochet/home.php">DaisyHook</a>
+        <div class="top-logo">
+            <a href="/crochet/home.php">DaisyHook</a>
+        </div>
+
+        <div class="top-search">
+            <?php include $_SERVER['DOCUMENT_ROOT'] . "/crochet/search/search_box.php"; ?>
+        </div>
+
+        <div class="top-social">
+            <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+
     </div>
+</div>
+
+<nav class="navbar" id="navbar">
 
     <div class="hamburger" id="hamburger">☰</div>
 
@@ -19,7 +38,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
         <li><a href="/crochet/home.php">Home</a></li>
 
-        <!-- Fashion Dropdown -->
         <li class="dropdown">
             <a href="javascript:void(0)" class="dropdown-btn">Fashion ▼</a>
             <ul class="dropdown-menu">
@@ -31,7 +49,6 @@ if (session_status() === PHP_SESSION_NONE) {
             </ul>
         </li>
 
-        <!-- Home Decor Dropdown -->
         <li class="dropdown">
             <a href="javascript:void(0)" class="dropdown-btn">Home Decor ▼</a>
             <ul class="dropdown-menu">
@@ -44,24 +61,40 @@ if (session_status() === PHP_SESSION_NONE) {
         </li>
 
         <li><a href="/crochet/bouquet/bouquets.php">Bouquet</a></li>
-        <!-- <li><a href="/crochet/checkout/check.php">Check</a></li> -->
 
-        <!-- <?php if (!isset($_SESSION["role"])): ?>
-            <li><a href="/crochet/login.php" class="btn">Sign In</a></li>
-            <li><a href="/crochet/register.php" class="btn primary">Sign Up</a></li>
+        <?php if (isset($_SESSION["user_id"])): ?>
+
+            <?php if ($_SESSION["role"] === "admin"): ?>
+                <li class="dropdown profile-dropdown">
+                    <a href="javascript:void(0)" class="dropdown-btn">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <?php echo htmlspecialchars($_SESSION["name"]); ?> ▼
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/crochet/admin_dashboard.php">Admin Dashboard</a></li>
+                        <li><a href="/crochet/admin_profile.php">Admin Profile</a></li>
+                        <li><a href="/crochet/logout.php">Logout</a></li>
+                    </ul>
+                </li>
+            <?php else: ?>
+                <li class="dropdown profile-dropdown">
+                    <a href="javascript:void(0)" class="dropdown-btn">
+                        <i class="fa-solid fa-user"></i>
+                        <?php echo htmlspecialchars($_SESSION["name"]); ?> ▼
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/crochet/profile.php">My Profile</a></li>
+                        <li><a href="/crochet/cart.php">My Cart</a></li>
+                        <li><a href="/crochet/wishlist.php">My Wishlist</a></li>
+                        <li><a href="/crochet/logout.php">Logout</a></li>
+                    </ul>
+                </li>
+            <?php endif; ?>
 
         <?php else: ?>
-            <?php if ($_SESSION["role"] == "user"): ?>
-                <li><a href="/crochet/orders.php">My Orders</a></li>
-            <?php endif; ?>
-
-            <?php if ($_SESSION["role"] == "admin"): ?>
-                <li><a href="/crochet/admin_dashboard.php">Dashboard</a></li>
-            <?php endif; ?>
-
-            <li><a href="/crochet/profile.php">Profile</a></li>
-            <li><a href="/crochet/logout.php" class="btn logout">Logout</a></li>
-        <?php endif; ?> -->
+            <li><a href="/crochet/login.php">Login</a></li>
+            <li><a href="/crochet/register.php">Sign Up</a></li>
+        <?php endif; ?>
 
     </ul>
 

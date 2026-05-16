@@ -5,7 +5,7 @@ include "../db.php";
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
-/* Get only Clothing from fashion table */
+/* Get Clothing */
 $sql = "SELECT * FROM fashion WHERE category = 'Clothing' ORDER BY id DESC";
 $result = $conn->query($sql);
 
@@ -20,7 +20,8 @@ if (!$result) {
     <title>Clothing Collection</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="fashion.css">
-    <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../footer.css"><link rel="stylesheet" href="../navbar.css">
+    <link rel="stylesheet" href="../search/search.css">
 
     <style>
         .fashion-section {
@@ -79,6 +80,7 @@ if (!$result) {
         }
     </style>
 </head>
+
 <body>
 
 <?php include "../navbar.php"; ?>
@@ -88,38 +90,35 @@ if (!$result) {
 
     <div class="fashion-grid">
 
-        <?php if ($result && $result->num_rows > 0): ?>
-            <?php while ($row = $result->fetch_assoc()): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
 
-                <div class="fashion-card">
-                    <a href="fashion.php?id=<?php echo $row['id']; ?>">
+        <div class="fashion-card">
+            <a href="fashion.php?id=<?php echo $row['id']; ?>">
 
-                        <?php
-                        $imageName = isset($row['fashions']) ? trim($row['fashions']) : '';
-                        $imageFile = __DIR__ . "/../fashion/" . $imageName;
-                        $imageSrc  = "../fashion/" . $imageName;
+                <?php
+                $img = trim($row['fashions']);
+                $file = __DIR__ . "/../fashions/" . $img;
+                $src  = "../fashions/" . $img;
+                ?>
 
-                        if (!empty($imageName) && file_exists($imageFile)) {
-                            echo '<img src="' . htmlspecialchars($imageSrc) . '" alt="' . htmlspecialchars($row['title']) . '">';
-                        } else {
-                            echo '<img src="../fashion/default.png" alt="No Image">';
-                        }
-                        ?>
+                <?php if (!empty($img) && file_exists($file)): ?>
+                    <img src="<?php echo $src; ?>">
+                <?php else: ?>
+                    <img src="../fashions/default.png">
+                <?php endif; ?>
 
-                        <h3><?php echo htmlspecialchars($row['title']); ?></h3>
-                        <p class="price">Rs <?php echo htmlspecialchars($row['price']); ?></p>
-                        <p class="category"><?php echo htmlspecialchars(isset($row['category']) ? $row['category'] : 'Clothing'); ?></p>
+                <h3><?php echo $row['title']; ?></h3>
+                <p class="price">Rs <?php echo $row['price']; ?></p>
 
-                    </a>
-                </div>
+            </a>
+        </div>
 
-            <?php endwhile; ?>
-        <?php else: ?>
-            <p>No clothing found.</p>
-        <?php endif; ?>
+        <?php endwhile; ?>
 
     </div>
 </section>
-<?php include "../footer.php"?>
+
+<?php include "../footer.php"; ?>
+
 </body>
 </html>

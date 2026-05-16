@@ -21,6 +21,8 @@ if (!$result) {
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="fashion.css">
     <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../navbar.css">
+    <link rel="stylesheet" href="../search/search.css">
 
     <style>
         .fashion-section {
@@ -96,13 +98,13 @@ if (!$result) {
 
                         <?php
                         $imageName = isset($row['fashions']) ? trim($row['fashions']) : '';
-                        $imageFile = __DIR__ . "/../fashion/" . $imageName;
-                        $imageSrc  = "../fashion/" . $imageName;
+                        $imageFile = __DIR__ . "/../fashions/" . $imageName;
+                        $imageSrc  = "../fashions/" . $imageName;
 
                         if (!empty($imageName) && file_exists($imageFile)) {
                             echo '<img src="' . htmlspecialchars($imageSrc) . '" alt="' . htmlspecialchars($row['title']) . '">';
                         } else {
-                            echo '<img src="../fashion/default.png" alt="No Image">';
+                            echo '<img src="../fashions/default.png" alt="No Image">';
                         }
                         ?>
 
@@ -120,6 +122,7 @@ if (!$result) {
 
     </div>
 </section>
-<?php include "../footer.php"?>
+
+<?php include "../footer.php"; ?>
 </body>
 </html>

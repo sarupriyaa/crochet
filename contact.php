@@ -19,6 +19,8 @@ img{
 </style>
 
 <link rel="stylesheet" href="contact.css">
+<link rel="stylesheet" href="navbar.css">
+<link rel="stylesheet" href="../search/search.css">
 
 </head>
 

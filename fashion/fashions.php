@@ -21,6 +21,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="fashion.css">
     <link rel="stylesheet" href="../footer.css">
     <link rel="stylesheet" href="../search/search.css">
+    <link rel="stylesheet" href="../navbar.css">
 
     <style>
         .fashion-grid {
@@ -62,7 +63,7 @@ $result = $conn->query($sql);
 <?php include "../navbar.php"; ?>
 
 <section class="fashion-section">
-            <?php include "../search/search_box.php"; ?>
+            <!-- <?php include "../search/search_box.php"; ?> -->
 
     <h2>Our Fashion Items</h2>
 

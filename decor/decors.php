@@ -21,6 +21,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="decor.css">
     <link rel="stylesheet" href="../footer.css">
     <link rel="stylesheet" href="../search/search.css">
+    <link rel="stylesheet" href="../navbar.css">
 
     <style>
         .bouquet-grid {
@@ -53,6 +54,7 @@ $result = $conn->query($sql);
         }
         h2{
             padding:3%;
+            color:white;
         }
     </style>
 </head>
@@ -61,7 +63,7 @@ $result = $conn->query($sql);
 <?php include "../navbar.php"; ?>
 
 <section class="bouquet-section">
-        <?php include "../search/search_box.php"; ?>
+        <!-- <?php include "../search/search_box.php"; ?> -->
 
     <h2>Our Decor Items</h2>
     <div class="bouquet-grid">

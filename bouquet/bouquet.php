@@ -13,7 +13,7 @@ if (!isset($_GET['id'])) {
 $id = intval($_GET['id']);
 
 /* Product query */
-$stmt = $conn->prepare("SELECT * FROM bouquets WHERE id=?");
+$stmt = $conn->prepare("SELECT * FROM bouquets WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $product = $stmt->get_result()->fetch_assoc();
@@ -24,9 +24,7 @@ if (!$product) {
 }
 
 /* Related bouquets */
-$related = $conn->prepare(
-    "SELECT id, title, image, price FROM bouquets WHERE id != ? ORDER BY RAND() LIMIT 10"
-);
+$related = $conn->prepare("SELECT id, title, image, price FROM bouquets WHERE id != ? ORDER BY RAND() LIMIT 10");
 $related->bind_param("i", $id);
 $related->execute();
 $relatedResult = $related->get_result();
@@ -35,42 +33,59 @@ $relatedResult = $related->get_result();
 <html>
 <head>
     <title><?php echo htmlspecialchars($product['title']); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="bouquet.css">
     <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../navbar.css">
+    <link rel="stylesheet" href="../search/search.css">
 
     <style>
         a{
             text-decoration:none;
         }
+
         h4{
             min-height:50px;
         }
+
         .action-links{
             display:flex;
             gap:15px;
             margin-top:20px;
             flex-wrap:wrap;
         }
-        .cart-btn,
+
+        /* .cart-btn,
         .wishlist-btn{
             border:none;
             padding:12px 20px;
             border-radius:8px;
             cursor:pointer;
         }
+
         .cart-btn a,
         .wishlist-btn a{
             color:white;
             display:block;
         }
+
         .cart-btn{
             background:#ff6b6b;
         }
+
         .wishlist-btn{
             background:#e91e63;
         }
+
+        .cart-btn:hover{
+            background:#ff4f4f;
+        }
+
+        .wishlist-btn:hover{
+            background:#d81b60;
+        } */
     </style>
 </head>
 
@@ -109,11 +124,11 @@ $relatedResult = $related->get_result();
                     </button>
                 <?php else: ?>
                     <button class="cart-btn">
-                        <a href="/crochet/cart.php?id=<?php echo $product['id']; ?>&type=bouquet">Add to Cart</a>
+                        <a href="/crochet/add_to_cart.php?id=<?php echo $product['id']; ?>&type=bouquet">Add to Cart</a>
                     </button>
 
                     <button class="wishlist-btn">
-                        <a href="/crochet/wishlist.php?id=<?php echo $product['id']; ?>&type=bouquet">❤️ Add to Wishlist</a>
+                        <a href="/crochet/add_to_wishlist.php?id=<?php echo $product['id']; ?>&type=bouquet">❤️ Add to Wishlist</a>
                     </button>
                 <?php endif; ?>
             </div>
@@ -128,7 +143,7 @@ $relatedResult = $related->get_result();
     <h3>You may also like</h3>
 
     <div class="related-grid">
-        <?php while($row = $relatedResult->fetch_assoc()): ?>
+        <?php while ($row = $relatedResult->fetch_assoc()): ?>
             <div class="related-card">
                 <a href="bouquet.php?id=<?php echo $row['id']; ?>">
                     <img src="../images/<?php echo htmlspecialchars($row['image']); ?>" alt="Related">

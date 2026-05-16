@@ -55,7 +55,9 @@ body{
 
 /* HERO SECTION */
 .hero{
-    background: linear-gradient(135deg, #fff6f9, #fff0f5);
+    /* background: linear-gradient(135deg, #fff6f9, #fff0f5); */
+    /* background: linear-gradient(135deg, #efedee, #d5d3d4);  */
+    /* background: rgb(212, 212, 223); */
     padding: 80px 40px;
     display:flex;
     align-items:center;
@@ -74,28 +76,33 @@ body{
 
 .head1{
     font-size: clamp(2.5rem,5vw,5rem);
-    color:#e91e63;
+    color:#cebac1;
     font-family:cursive;
     animation: glowText 2.5s ease-in-out infinite alternate;
+    /* color:#e91e63; */
+
 }
 
 .div1 h2{
     font-size: clamp(1.8rem,3vw,3.5rem);
     margin-top:10px;
-    color:#72a499;
+    color:#0e6d58;
     animation: fadeIn 1.4s ease;
+    /* color:#72a499; */
+
 }
 
 .button1{
     margin-top:25px;
     padding:12px 28px;
-    background:#e91e63;
+    background:#c61952;
     color:white;
     border:none;
     border-radius:25px;
     cursor:pointer;
     transition:.35s ease;
     box-shadow: 0 8px 20px rgba(233, 30, 99, 0.25);
+    /* background:#e91e63; */
 }
 
 .button1:hover{
@@ -216,6 +223,7 @@ p>a:hover{
     font-size:clamp(2rem,4vw,5rem);
     font-family:'Times New Roman', serif;
     transition: .35s ease;
+    color: whitesmoke;
 }
 
 .title1 h3:hover{
@@ -402,7 +410,7 @@ footer{
 }
 
 /* NAVBAR */
-.navbar{
+/* .navbar{
     background:rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
     width:100%;
@@ -461,7 +469,6 @@ footer{
     transform: translateY(-2px);
 }
 
-/* BUTTONS */
 .btn{
     padding:8px 15px;
     border-radius:6px;
@@ -483,7 +490,6 @@ footer{
     box-shadow: 0 10px 18px rgba(255, 77, 77, .25);
 }
 
-/* DROPDOWN */
 .dropdown{
     position:relative;
 }
@@ -516,7 +522,6 @@ footer{
     transform: translateX(4px);
 }
 
-/* HAMBURGER */
 .hamburger{
     font-size:28px;
     cursor:pointer;
@@ -529,7 +534,6 @@ footer{
     color:#e91e63;
 }
 
-/* RESPONSIVE DESIGN */
 @media(max-width:900px){
 
     .hero{
@@ -611,7 +615,6 @@ footer{
     }
 }
 
-/* ANIMATIONS */
 @keyframes fadeIn {
     from{
         opacity:0;
@@ -672,4 +675,4 @@ footer{
     to{
         text-shadow: 0 0 18px rgba(233, 30, 99, 0.25);
     }
-}       
+}        */

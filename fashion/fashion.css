@@ -59,6 +59,7 @@
     margin: auto;
     padding: 50px 10px;
     margin-top: 50px;
+    background: whitesmoke;
 }
 
 .product-container {
@@ -85,6 +86,8 @@
 .product-details h2 {
     font-size: 50px;
     margin-bottom: 35px;
+    color: rgb(212, 149, 32);
+
 }
 
 .description {
@@ -101,6 +104,9 @@
     transition: 0.3s;
     background: #ff7aa2;
     color: white;
+    width:40%;
+    height: 6vh;
+    margin-top: 20px;
 }
 
 .wishlist-btn:hover {
@@ -125,8 +131,9 @@
 hr {
     width: 80%;
     margin: auto;
-    border: 2px solid gray;
+    /* border: 2px solid gray; */
     margin-top: 70px;
+    border: 2px solid rgb(205, 203, 203);
 }
 
 .double-product {
@@ -136,6 +143,7 @@ hr {
 
 .double-product h3 {
     margin-bottom: 20px;
+    color: whitesmoke;
 }
 
 /* horizontal scroll container */
@@ -243,4 +251,7 @@ hr {
     .double-product {
         width: 90%;
     }
+}
+h2{
+    color: whitesmoke;
 }

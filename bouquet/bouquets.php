@@ -23,10 +23,12 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="bouquet.css">
     <link rel="stylesheet" href="../footer.css">
     <link rel="stylesheet" href="../search/search.css">
+    <link rel="stylesheet" href="../navbar.css">
 
     <style>
         h2 {
             padding: 20px;
+            color:white;
         }
         a {
             text-decoration: none;
@@ -40,7 +42,7 @@ $result = $conn->query($sql);
 
 <section class="bouquet-section">
 
-    <?php include "../search/search_box.php"; ?>
+    <!-- <?php include "../search/search_box.php"; ?> -->
 
     <h2>Our Bouquets</h2>
 

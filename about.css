@@ -49,16 +49,20 @@ body {
 .about-text h1 {
     font-size: 42px;
     margin-bottom: 20px;
-    color: #7a4e3a;
+    /* color: #7a4e3a; */
     animation: fadeUp 1.2s ease;
+    color: #663925;
 }
 
 .about-text p {
     font-size: 17px;
     line-height: 1.8;
     margin-bottom: 18px;
-    color: #4a4a4a;
+    /* color: #4a4a4a; */
+    /* color: whitesmoke; */
     animation: fadeUp 1.4s ease;
+    color: #fbecec; 
+
 }
 
 .about-btn {
@@ -103,7 +107,9 @@ body {
 .mission-section p {
     font-size: 17px;
     line-height: 1.8;
-    color: #4a4a4a;
+    /* color: #4a4a4a; */
+    color: #fbecec; 
+
 }
 
 /* Tablet */

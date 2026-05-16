@@ -5,7 +5,6 @@ ini_set("display_errors", 1);
 
 include "../db.php";
 
-/* Check ID */
 if (!isset($_GET['id'])) {
     header("Location: decors.php");
     exit();
@@ -13,108 +12,51 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 
-/* Get decor item */
 $stmt = $conn->prepare("SELECT * FROM decors WHERE id = ?");
-if (!$stmt) {
-    die("Prepare failed (product): " . $conn->error);
-}
-
 $stmt->bind_param("i", $id);
-
-if (!$stmt->execute()) {
-    die("Execute failed (product): " . $stmt->error);
-}
-
-$result = $stmt->get_result();
-$product = $result->fetch_assoc();
+$stmt->execute();
+$product = $stmt->get_result()->fetch_assoc();
 
 if (!$product) {
     echo "Decor item not found";
     exit();
 }
 
-/* Related decors (same category) */
 $related = $conn->prepare(
     "SELECT id, title, decoration, price FROM decors
      WHERE category = ? AND id != ?
      ORDER BY RAND() LIMIT 10"
 );
 
-if (!$related) {
-    die("Prepare failed (related): " . $conn->error);
-}
-
 $category = $product['category'] ?? '';
-
 $related->bind_param("si", $category, $id);
-
-if (!$related->execute()) {
-    die("Execute failed (related): " . $related->error);
-}
-
+$related->execute();
 $relatedResult = $related->get_result();
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($product['title']); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="decor.css">
     <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../navbar.css">
 
     <style>
-        a{
-            text-decoration:none;
+        a { text-decoration: none; }
+        h4 { min-height: 50px; }
+        .category {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
-
-        h4{
-            min-height:50px;
-        }
-
-        .category{
-            color:#777;
-            font-size:14px;
-            margin-bottom:10px;
-        }
-
-        .action-links{
-            display:flex;
-            gap:15px;
-            margin-top:20px;
-            flex-wrap:wrap;
-        }
-
-        .cart-btn,
-        .wishlist-btn{
-            border:none;
-            padding:12px 20px;
-            border-radius:8px;
-            cursor:pointer;
-        }
-
-        .cart-btn a,
-        .wishlist-btn a{
-            color:white;
-            display:block;
-        }
-
-        .cart-btn{
-            background:#ff6b6b;
-        }
-
-        .wishlist-btn{
-            background:#e91e63;
-        }
-
-        .cart-btn:hover{
-            background:#ff5252;
-        }
-
-        .wishlist-btn:hover{
-            background:#d81b60;
+        .action-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
     </style>
 </head>
@@ -180,7 +122,6 @@ $relatedResult = $related->get_result();
         <?php while ($row = $relatedResult->fetch_assoc()): ?>
             <div class="related-card">
                 <a href="decor.php?id=<?php echo $row['id']; ?>">
-
                     <?php if (!empty($row['decoration'])): ?>
                         <img src="../decoration/<?php echo htmlspecialchars($row['decoration']); ?>" alt="Related">
                     <?php else: ?>

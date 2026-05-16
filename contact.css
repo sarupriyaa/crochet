@@ -131,14 +131,16 @@ body {
 .contact-info h4 {
     font-size: 20px;
     margin-bottom: 8px;
-    color: #5a392f;
+    /* color: #5a392f; */
+    color: #3d3635;
 }
 
 .contact-info p {
     font-size: 17px;
     line-height: 1.8;
     margin-bottom: 24px;
-    color: #4b4b4b;
+    /* color: #4b4b4b; */
+    color: #dcd2d2; 
 }
 
 .contact-info .email {

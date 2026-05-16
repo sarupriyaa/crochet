@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user["role"] == "admin") {
             header("Location: admin_dashboard.php");
         } else {
-            header("Location: recipes.php");
+            header("Location: home.php");
         }
         exit();
 
@@ -41,6 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="footer.css">
 
+<link rel="stylesheet" href="navbar.css">
+<link rel="stylesheet" href="../search/search.css">
     <style>
         *{
             margin:0;

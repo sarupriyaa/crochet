@@ -7,7 +7,7 @@ $_SESSION = [];
 /* Destroy the session */
 session_destroy();
 
-/* Optional: destroy session cookie */
+/* Destroy session cookie (extra security) */
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
@@ -21,7 +21,7 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-/* Redirect to home or login */
-header("Location: /crochet/home.php");
+/* Redirect user after logout */
+header("Location: /crochet/home.php"); // or login.php
 exit();
 ?>
