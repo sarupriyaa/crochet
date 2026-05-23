@@ -1,4 +1,43 @@
-<?php include "navbar.php"; ?>
+<?php 
+// Establish database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "snugglestitch";
+
+$mysqli = new mysqli($servername, $username, $password, $dbname);
+
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+
+$alert_message = "";
+
+// Handle form submission logic
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = trim($_POST['visitor_name']);
+    $email = trim($_POST['visitor_email']);
+    $message = trim($_POST['visitor_message']);
+
+    if (!empty($name) && !empty($email) && !empty($message)) {
+        // Safe prepared statement insertion matching your SQL schema
+        $stmt = $mysqli->prepare("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $name, $email, $message);
+        
+        if ($stmt->execute()) {
+            $alert_message = "<div style='padding:12px; margin-bottom:15px; background:#e6f4ea; color:#137333; border-radius:6px; font-weight:bold; font-size:14px;'>🎉 Message sent successfully!</div>";
+        } else {
+            $alert_message = "<div style='padding:12px; margin-bottom:15px; background:#fce8e6; color:#c5221f; border-radius:6px; font-weight:bold; font-size:14px;'>Error: Failed to save message.</div>";
+        }
+        $stmt->close();
+    } else {
+        $alert_message = "<div style='padding:12px; margin-bottom:15px; background:#fef7e0; color:#b06000; border-radius:6px; font-weight:bold; font-size:14px;'>Warning: Please fill out all required fields.</div>";
+    }
+}
+$mysqli->close();
+
+include "navbar.php"; 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +53,6 @@ img{
  object-fit:cover;
  margin:auto;
  margin-bottom:50px;
- 
 }
 </style>
 
@@ -27,38 +65,31 @@ img{
 <body>
 
 <section class="contact-section">
-    <!-- <img src="https://www.blingcute.com/cdn/shop/files/Untitled_design_24.jpg?v=1653287099" alt=""> -->
      <img src="images/yarns.jpg" alt="">
 
 <div class="contact-container">
-
-<!-- LEFT SIDE -->
-
-
-
-<!-- RIGHT SIDE FORM -->
 
 <div class="contact-form">
 
 <h2>Send a message</h2>
 
-<form>
+<?php echo $alert_message; ?>
+
+<form action="contact.php" method="POST">
 
 <div class="input-row">
-
-<input type="text" placeholder="Your name *" required>
-
-<input type="email" placeholder="Email *" required>
-
+<input type="text" name="visitor_name" placeholder="Your name *" required>
+<input type="email" name="visitor_email" placeholder="Email *" required>
 </div>
 
-<textarea placeholder="Message"></textarea>
+<textarea name="visitor_message" placeholder="Message *" required></textarea>
 
 <button type="submit">SUBMIT</button>
 
 </form>
 
 </div>
+
 <div class="contact-info">
 
 <h4>Email</h4>
@@ -76,7 +107,6 @@ img{
 <p>Please email support@snugglestitch.com</p>
 
 </div>
-
 
 </div>
 

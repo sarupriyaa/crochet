@@ -9,26 +9,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST["email"]);
     $password = trim($_POST["password"]);
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $user = $stmt->get_result()->fetch_assoc();
+    // ================= VALIDATION =================
 
-    if ($user && password_verify($password, $user["password"])) {
+    if (empty($email) || empty($password)) {
+        $error = "❌ All fields are required!";
+    }
 
-        $_SESSION["user_id"] = $user["id"];
-        $_SESSION["name"] = $user["name"];
-        $_SESSION["role"] = $user["role"];
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "❌ Invalid email format!";
+    }
 
-        if ($user["role"] == "admin") {
-            header("Location: admin_dashboard.php");
+    elseif (strlen($password) < 8) {
+        $error = "❌ Password must be at least 8 characters!";
+    }
+
+    else {
+
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
+
+        if ($user && password_verify($password, $user["password"])) {
+
+            $_SESSION["user_id"] = $user["id"];
+            $_SESSION["name"] = $user["name"];
+            $_SESSION["role"] = $user["role"];
+
+            if ($user["role"] == "admin") {
+                header("Location: admin_dashboard.php");
+            } else {
+                header("Location: home.php");
+            }
+            exit();
+
         } else {
-            header("Location: home.php");
+            $error = "❌ Invalid email or password!";
         }
-        exit();
-
-    } else {
-        $error = "Invalid email or password";
     }
 }
 ?>
@@ -39,10 +56,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="footer.css">
 
-<link rel="stylesheet" href="navbar.css">
-<link rel="stylesheet" href="../search/search.css">
+    <link rel="stylesheet" href="footer.css">
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="../search/search.css">
+
     <style>
         *{
             margin:0;
@@ -74,6 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .login-box h2{
             text-align:center;
             margin-bottom:30px;
+            color: black;
         }
 
         .input-group{
@@ -162,22 +181,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <form method="POST">
+
             <div class="input-group">
                 <label>Email</label>
-                <input type="email" name="email" required>
+
+                <input 
+                    type="email" 
+                    name="email" 
+                    required
+                    placeholder="Enter your email">
             </div>
 
             <div class="input-group password-box">
                 <label>Password</label>
-                <input type="password" name="password" id="password" required>
-                <i class="fa-solid fa-eye-slash" onclick="togglePassword(this)"></i>
+
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    required
+                    minlength="8"
+                    placeholder="Enter your password">
+
+                <i class="fa-solid fa-eye-slash"
+                   onclick="togglePassword(this)"></i>
             </div>
 
             <button type="submit">LOGIN</button>
+
         </form>
 
         <div class="bottom-text">
-            Don't have an account? <a href="register.php">Sign up</a>
+            Don't have an account?
+            <a href="register.php">Sign up</a>
         </div>
 
     </div>
@@ -185,19 +221,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <script>
 function togglePassword(icon){
+
     const input = document.getElementById("password");
 
     if(input.type === "password"){
+
         input.type = "text";
+
         icon.classList.remove("fa-eye-slash");
         icon.classList.add("fa-eye");
+
     } else {
+
         input.type = "password";
+
         icon.classList.remove("fa-eye");
         icon.classList.add("fa-eye-slash");
     }
 }
 </script>
-<?php include "footer.php"?>
+
+<?php include "footer.php"; ?>
+
 </body>
 </html>

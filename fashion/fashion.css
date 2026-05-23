@@ -98,7 +98,7 @@
 .wishlist-btn {
     padding: 12px 25px;
     border: none;
-    border-radius: 25px;
+    border-radius: 8px;
     cursor: pointer;
     margin-right: 10px;
     transition: 0.3s;
@@ -253,5 +253,6 @@ hr {
     }
 }
 h2{
-    color: whitesmoke;
+    /* color: whitesmoke; */
+    color: darkblue;
 }

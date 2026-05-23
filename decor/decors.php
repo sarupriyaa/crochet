@@ -54,7 +54,7 @@ $result = $conn->query($sql);
         }
         h2{
             padding:3%;
-            color:white;
+            color:darkblue;
         }
     </style>
 </head>

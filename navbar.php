@@ -21,10 +21,10 @@ if (session_status() === PHP_SESSION_NONE) {
         </div>
 
         <div class="top-social">
-            <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
-            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.pinterest.com/" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            <a href="https://www.facebook.com/" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.youtube.com/" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
         </div>
 
     </div>
@@ -72,7 +72,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="/crochet/admin_dashboard.php">Admin Dashboard</a></li>
-                        <li><a href="/crochet/admin_profile.php">Admin Profile</a></li>
+                        <!-- <li><a href="/crochet/admin_profile.php">Admin Profile</a></li> -->
                         <li><a href="/crochet/logout.php">Logout</a></li>
                     </ul>
                 </li>
@@ -84,8 +84,8 @@ if (session_status() === PHP_SESSION_NONE) {
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="/crochet/profile.php">My Profile</a></li>
-                        <li><a href="/crochet/cart.php">My Cart</a></li>
-                        <li><a href="/crochet/wishlist.php">My Wishlist</a></li>
+                        <!-- <li><a href="/crochet/cart.php">My Cart</a></li>
+                        <li><a href="/crochet/wishlist.php">My Wishlist</a></li> -->
                         <li><a href="/crochet/logout.php">Logout</a></li>
                     </ul>
                 </li>

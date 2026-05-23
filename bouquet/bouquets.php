@@ -28,7 +28,7 @@ $result = $conn->query($sql);
     <style>
         h2 {
             padding: 20px;
-            color:white;
+            color:darkblue;
         }
         a {
             text-decoration: none;

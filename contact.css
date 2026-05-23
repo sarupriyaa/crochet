@@ -140,7 +140,9 @@ body {
     line-height: 1.8;
     margin-bottom: 24px;
     /* color: #4b4b4b; */
-    color: #dcd2d2; 
+    /* color: #dcd2d2;  */
+    color: #0b0742;
+
 }
 
 .contact-info .email {

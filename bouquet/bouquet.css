@@ -42,6 +42,7 @@
     margin-top: 15px;
     font-size: 18px;
     min-height: 50px;
+    color: black;
 }
 
 .price {
@@ -123,7 +124,8 @@
 
 .cart-btn {
     padding: 12px 25px;
-    background: #ff4d88;
+    /* background: #ff4d88; */
+    background:#ff6b6b;
     color: white;
     font-size: 16px;
 }
@@ -134,7 +136,8 @@
 
 .wishlist-btn {
     padding: 12px 25px;
-    background: #ff7aa2;
+    /* background: #ff7aa2; */
+    background:#e91e63;
     color: white;
     font-size: 16px;
 }
@@ -148,6 +151,22 @@
     color: white;
     text-decoration: none;
     display: block;
+}
+.buy{
+    background: #2ecc71;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+    margin-top: 10px;
+
+}
+.buy:hover {
+    background: #27ae60;
 }
 
 hr {

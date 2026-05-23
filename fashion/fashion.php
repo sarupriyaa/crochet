@@ -12,6 +12,7 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 
+/* Product query matching fashion table schema */
 $stmt = $conn->prepare("SELECT * FROM fashion WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -22,6 +23,7 @@ if (!$product) {
     exit();
 }
 
+/* Related items filtered by category */
 $related = $conn->prepare(
     "SELECT id, title, fashions, price 
      FROM fashion
@@ -44,6 +46,7 @@ $relatedResult = $related->get_result();
     <link rel="stylesheet" href="fashion.css">
     <link rel="stylesheet" href="../footer.css">
     <link rel="stylesheet" href="../navbar.css">
+    <link rel="stylesheet" href="../search/search.css">
 
     <style>
         a {
@@ -65,6 +68,81 @@ $relatedResult = $related->get_result();
             gap: 15px;
             margin-top: 20px;
             flex-wrap: wrap;
+        }
+
+        /* Quantity Form Elements */
+        .quantity-box {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quantity-box label {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .quantity-box input {
+            width: 90px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .quantity-box input:focus {
+            border-color: #e91e63;
+        }
+
+        /* Button Styling fallbacks */
+        .cart-btn {
+            background: #ff6b6b;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+        }
+
+        .cart-btn:hover {
+            background: #ff4f4f;
+        }
+
+        .wishlist-btn {
+            background: #e91e63;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+        }
+
+        .wishlist-btn hover {
+            background: #d81b60;
+        }
+
+        .wishlist-btn a {
+            color: white;
+        }
+
+        .buy {
+            background: #2ecc71;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .buy:hover {
+            background: #27ae60;
         }
     </style>
 </head>
@@ -103,25 +181,29 @@ $relatedResult = $related->get_result();
                 <?php echo htmlspecialchars($product['description']); ?>
             </p>
 
-            <div class="action-links">
-                <?php if (!isset($_SESSION["user_id"])): ?>
-                    <button class="cart-btn">
-                        <a href="/crochet/login.php">Add to Cart</a>
-                    </button>
+            <form id="purchaseForm" method="GET">
+                <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+                <input type="hidden" name="type" value="fashion">
 
-                    <button class="wishlist-btn">
-                        <a href="/crochet/login.php">❤️ Add to Wishlist</a>
-                    </button>
-                <?php else: ?>
-                    <button class="cart-btn">
-                        <a href="/crochet/add_to_cart.php?id=<?php echo $product['id']; ?>&type=fashion">Add to Cart</a>
-                    </button>
+                <div class="quantity-box">
+                    <label>Quantity:</label>
+                    <input type="number" name="quantity" value="1" min="1" max="10">
+                </div>
 
-                    <button class="wishlist-btn">
-                        <a href="/crochet/add_to_wishlist.php?id=<?php echo $product['id']; ?>&type=fashion">❤️ Add to Wishlist</a>
-                    </button>
-                <?php endif; ?>
-            </div>
+                <div class="action-links">
+                    <?php if (!isset($_SESSION["user_id"])): ?>
+                        <button type="button" class="cart-btn" onclick="location.href='/crochet/login.php'">Add to Cart</button>
+                        <button type="button" class="wishlist-btn" onclick="location.href='/crochet/login.php'">❤️ Add to Wishlist</button>
+                        <button type="button" class="buy" onclick="location.href='/crochet/login.php'">Buy Now</button>
+                    <?php else: ?>
+                        <button type="submit" formaction="/crochet/add_to_cart.php" class="cart-btn">Add to Cart</button>
+                        <button type="button" class="wishlist-btn">
+                            <a href="/crochet/add_to_wishlist.php?id=<?php echo $product['id']; ?>&type=fashion">❤️ Add to Wishlist</a>
+                        </button>
+                        <button type="submit" formaction="/crochet/payment.php" class="buy">Buy Now</button>
+                    <?php endif; ?>
+                </div>
+            </form>
         </div>
 
     </div>
