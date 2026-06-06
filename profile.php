@@ -63,7 +63,6 @@ $is_admin = ($user["role"] === "admin");
             min-height: 100vh;
         }
 
-        /* --- DASHBOARD SIDEBAR --- */
         .sidebar {
             width: 260px;
             background: var(--sidebar-bg);
@@ -116,7 +115,6 @@ $is_admin = ($user["role"] === "admin");
             transition: all 0.2s ease;
         }
 
-        /* Dynamic background opacity colors according to system styles */
         .nav-links li.active a, 
         .nav-links a:hover {
             background: <?php echo $is_admin ? 'rgba(99, 91, 255, 0.08)' : 'rgba(233, 30, 99, 0.06)'; ?>;
@@ -135,7 +133,6 @@ $is_admin = ($user["role"] === "admin");
             margin: 15px 0;
         }
 
-        /* --- MAIN DASHBOARD WORKSPACE --- */
         .main-content {
             margin-left: 260px;
             flex-grow: 1;
@@ -145,7 +142,6 @@ $is_admin = ($user["role"] === "admin");
             align-items: flex-start;
         }
 
-        /* Profile Sheet Card Window */
         .profile-card {
             width: 100%;
             max-width: 750px;
@@ -155,7 +151,6 @@ $is_admin = ($user["role"] === "admin");
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
         }
 
-        /* Header Identity Showcase */
         .profile-top {
             display: flex;
             align-items: center;
@@ -191,7 +186,6 @@ $is_admin = ($user["role"] === "admin");
             font-size: 15px;
         }
 
-        /* Information Value Fields */
         .info-box {
             background: #fafafa;
             border-radius: 14px;
@@ -234,7 +228,6 @@ $is_admin = ($user["role"] === "admin");
             font-size: 18px;
         }
 
-        /* Tablet & Mobile View Adjustment Breakdowns */
         @media (max-width: 900px) {
             body {
                 flex-direction: column;

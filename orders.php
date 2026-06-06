@@ -5,7 +5,7 @@ ini_set("display_errors", 1);
 
 include "db.php";
 
-/* 1. Access Control: Security Check */
+/* 1. Access Control */
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit();
@@ -13,419 +13,634 @@ if (!isset($_SESSION["user_id"])) {
 
 $user_id = $_SESSION["user_id"];
 
-/* 2. Fetch User Info to maintain active session profiling */
+/* 2. Fetch User Info */
 $user_stmt = $conn->prepare("SELECT name, email, role FROM users WHERE id=?");
 $user_stmt->bind_param("i", $user_id);
 $user_stmt->execute();
 $user = $user_stmt->get_result()->fetch_assoc();
+$is_admin = ($user && ($user["role"] ?? "") === "admin");
 
-/* 3. Execute Dynamic Queries based on your exact SQL schema columns */
-// Count distinct pipeline status segments for metrics
+/* 3. Safe Query Logic */
+$column_check = $conn->query("SHOW COLUMNS FROM orders LIKE 'user_id'");
+$has_user_id_col = ($column_check && $column_check->num_rows > 0);
+
+$where_sql = "";
+if (!$is_admin && $has_user_id_col) {
+    $where_sql = "WHERE user_id = " . intval($user_id);
+}
+
+/* 4. Execute Queries */
 $metrics_query = "SELECT 
     COUNT(id) as total,
     SUM(CASE WHEN LOWER(status) IN ('success', 'completed', 'paid') THEN 1 ELSE 0 END) as completed,
     SUM(CASE WHEN LOWER(status) IN ('pending', 'processing') THEN 1 ELSE 0 END) as pending
-    FROM orders";
+    FROM orders $where_sql";
+
 $metrics_res = $conn->query($metrics_query)->fetch_assoc();
 
 $count_total     = $metrics_res['total'] ?? 0;
 $count_completed = $metrics_res['completed'] ?? 0;
 $count_pending   = $metrics_res['pending'] ?? 0;
 
-// Fetch all rows according to schema: id, product_id, amount, payment_method, status, created_at
-// Fetch all rows including customer details
-$orders_query = "SELECT id, product_id, amount, payment_method, status, created_at, customer_name, address, phone_number FROM orders ORDER BY id DESC";
-$orders_result = $conn->query($orders_query);?>
+$orders_query = "SELECT id, product_id, amount, payment_method, status, created_at, customer_name, phone_number, region, city, area 
+                 FROM orders $where_sql ORDER BY id DESC";
+$orders_result = $conn->query($orders_query);
+
+/* FIX: Status class function */
+function render_status_class($status) {
+    $status_clean = strtolower(trim($status ?? ""));
+
+    if (in_array($status_clean, ["success", "completed", "paid"])) {
+        return "status-success";
+    } elseif (in_array($status_clean, ["pending", "processing"])) {
+        return "status-pending";
+    } elseif (in_array($status_clean, ["failed", "cancelled", "canceled"])) {
+        return "status-failed";
+    } else {
+        return "status-default";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders Center - SuperDash</title>
+<meta charset="UTF-8">
+<title>Manage Orders - DaisyHook</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
-        :root {
-            --bg-color: #f4f5fa;
-            --sidebar-bg: #ffffff;
-            --card-bg: #ffffff;
-            --primary-accent: #635bff; 
-            --text-dark: #1e1e2f;
-            --text-muted: #7e7e8f;
-            --border-color: #f1f1f5;
-        }
+<style>
+:root {
+    --bg-color: #f4f5fa;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --primary-accent: #635bff;
+    --text-dark: #1e1e2f;
+    --text-muted: #7e7e8f;
+    --border-color: #f1f1f5;
+    --green: #29cc97;
+    --orange: #ff9f40;
+    --red: #ff6384;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            display: flex;
-            min-height: 100vh;
-        }
+body {
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    display: flex;
+    min-height: 100vh;
+}
 
-        /* --- DASHBOARD SIDEBAR CONTAINER --- */
-        .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 30px 20px;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 100;
-        }
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 30px 20px;
+    position: fixed;
+    height: 100vh;
+}
 
-        .logo-area {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--primary-accent);
-            margin-bottom: 35px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.logo-area {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-accent);
+    margin-bottom: 35px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        .logo-area span {
-            font-size: 11px;
-            font-weight: 400;
-            color: var(--text-muted);
-            display: block;
-        }
+.logo-area span {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    display: block;
+}
 
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+.nav-links {
+    list-style: none;
+}
 
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 15px;
-            transition: all 0.2s ease;
-        }
+.nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 15px;
+}
 
-        .nav-links li.active a, 
-        .nav-links a:hover {
-            background: rgba(99, 91, 255, 0.08);
-            color: var(--primary-accent);
-        }
+.nav-links li.active a,
+.nav-links a:hover {
+    background: rgba(99, 91, 255, 0.08);
+    color: var(--primary-accent);
+}
 
-        .nav-links a i {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
+.nav-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 15px 0;
+}
 
-        .nav-divider {
-            height: 1px;
-            background: var(--border-color);
-            margin: 15px 0;
-        }
+.main-content {
+    margin-left: 260px;
+    flex-grow: 1;
+    padding: 40px;
+}
 
-        /* --- MAIN VIEWPORT PANEL --- */
-        .main-content {
-            margin-left: 260px;
-            flex-grow: 1;
-            padding: 40px;
-            max-width: 1400px;
-        }
+.dashboard-header {
+    margin-bottom: 35px;
+}
 
-        .dashboard-header {
-            margin-bottom: 35px;
-        }
+.dashboard-header h1 {
+    font-size: 28px;
+    color: #111;
+}
 
-        .dashboard-header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #111;
-        }
+.dashboard-header p {
+    margin-top: 4px;
+    color: var(--text-muted);
+}
 
-        .dashboard-header p {
-            margin-top: 4px;
-            color: var(--text-muted);
-        }
+.orders-summary-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 35px;
+}
 
-        /* Statistical Pipeline Overview Grid Rows */
-        .order-metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-            margin-bottom: 35px;
-        }
+.summary-box {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+}
 
-        .metric-mini-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.summary-info h3 {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
 
-        .metric-meta h3 {
-            font-size: 13px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
+.summary-info p {
+    font-size: 24px;
+    font-weight: 700;
+}
 
-        .metric-meta p {
-            font-size: 26px;
-            font-weight: 700;
-            color: #111;
-        }
+.summary-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
 
-        .icon-circle-wrapper {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
+.bg-purple { background: rgba(99,91,255,0.1); color: var(--primary-accent); }
+.bg-green { background: rgba(41,204,151,0.1); color: var(--green); }
+.bg-orange { background: rgba(255,159,64,0.1); color: var(--orange); }
 
-        .cl-blue { background: rgba(54, 162, 235, 0.1); color: #36a2eb; }
-        .cl-green { background: rgba(41, 204, 151, 0.1); color: #29cc97; }
-        .cl-orange { background: rgba(255, 159, 64, 0.1); color: #ff9f40; }
+.table-panel {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    overflow-x: auto;
+}
 
-        /* Main Data Display Panel Table Layout */
-        .table-panel {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
-            overflow-x: auto;
-        }
+.table-panel h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
 
-        .table-panel h2 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+}
 
-        .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
+.orders-table th {
+    background: #fafafa;
+    color: var(--text-muted);
+    padding: 16px;
+    font-size: 13px;
+    text-transform: uppercase;
+    text-align: left;
+}
 
-        .orders-table th {
-            background-color: #fafafa;
-            color: var(--text-muted);
-            padding: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border-color);
-        }
+.orders-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+}
 
-        .orders-table td {
-            padding: 16px;
-            font-size: 15px;
-            color: #333;
-            border-bottom: 1px solid var(--border-color);
-        }
+.order-id {
+    font-weight: 700;
+    color: #111;
+}
 
-        .orders-table tr:last-child td {
-            border-bottom: none;
-        }
+.amount-text {
+    font-weight: 600;
+}
 
-        /* Status Badge Indicators */
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
+.status-badge {
+    display: inline-flex;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
 
-        .st-success { background: rgba(41, 204, 151, 0.1); color: #29cc97; }
-        .st-pending { background: rgba(255, 159, 64, 0.1); color: #ff9f40; }
-        .st-failed { background: rgba(255, 99, 132, 0.1); color: #ff6384; }
-        .st-default { background: rgba(126, 126, 143, 0.1); color: var(--text-muted); }
+.status-success { background: rgba(41,204,151,0.1); color: var(--green); }
+.status-pending { background: rgba(255,159,64,0.1); color: var(--orange); }
+.status-failed { background: rgba(255,99,132,0.1); color: var(--red); }
+.status-default { background: rgba(126,126,143,0.1); color: var(--text-muted); }
 
-        .item-id { font-weight: 700; color: var(--primary-accent); }
-        .price-tag { font-weight: 600; color: #111; }
+.customer-name {
+    font-weight: 600;
+}
 
-        .empty-view {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
+.customer-address,
+.customer-phone {
+    font-size: 12px;
+    margin-top: 2px;
+}
 
-        .empty-view i {
-            font-size: 52px;
-            margin-bottom: 15px;
-            color: #e0e0e6;
-        }
+.customer-address {
+    color: var(--text-muted);
+}
 
-        @media (max-width: 900px) {
-            body { flex-direction: column; }
-            .sidebar {
-                width: 100%; height: auto; position: relative; padding: 20px;
-                border-right: none; border-bottom: 1px solid var(--border-color);
-            }
-            .main-content { margin-left: 0; padding: 20px; }
-        }
-    </style>
+.customer-phone {
+    color: var(--primary-accent);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 50px;
+    color: var(--text-muted);
+}
+
+/* USER VIEW */
+.user-shell {
+    width: 100%;
+    min-height: 100vh;
+    padding: 34px;
+}
+
+.user-main {
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.user-topbar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.user-brand {
+    color: var(--primary-accent);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.user-actions a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-left: 18px;
+}
+
+.user-hero {
+    background: linear-gradient(135deg, rgba(99,91,255,0.11), rgba(41,204,151,0.10));
+    border-radius: 26px;
+    padding: 34px;
+    margin-bottom: 28px;
+}
+
+.user-hero h1 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.user-hero p {
+    color: var(--text-muted);
+}
+
+.user-orders-title {
+    font-size: 20px;
+    margin: 26px 0 16px;
+}
+
+.user-order-card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr auto;
+    gap: 18px;
+    align-items: center;
+}
+
+.user-order-card .meta {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.user-order-card .amount {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+@media(max-width: 900px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .orders-summary-row {
+        grid-template-columns: 1fr;
+    }
+
+    .user-order-card {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <aside class="sidebar">
-        <div>
-            <div class="logo-area">
-                <i class="fa-solid fa-square-poll-vertical"></i>
-                <div>DaisyHook <span>Enterprise v2.4</span></div>
+<?php if ($is_admin) { ?>
+
+<aside class="sidebar">
+    <div class="logo-area">
+        <i class="fa-solid fa-square-poll-vertical"></i>
+        <div>DaisyHook <span>Enterprise v2.4</span></div>
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="admin_dashboard.php"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+        <li><a href="home.php"><i class="fa-solid fa-house"></i> View Live Site</a></li>
+
+        <div class="nav-divider"></div>
+
+        <li class="active"><a href="orders.php"><i class="fa-solid fa-box-archive"></i> Manage Orders</a></li>
+        <li><a href="admin_payments.php"><i class="fa-solid fa-credit-card"></i> Payments Logs</a></li>
+        <li><a href="admin_users.php"><i class="fa-solid fa-users-gear"></i> Manage Users</a></li>
+        <li><a href="admin_bouquets.php"><i class="fa-solid fa-fleur-de-lis"></i> Bouquets Dept</a></li>
+        <li><a href="admin_fashion.php"><i class="fa-solid fa-shirt"></i> Fashion Catalog</a></li>
+        <li><a href="admin_decors.php"><i class="fa-solid fa-couch"></i> Decor Products</a></li>
+        <li><a href="admin_contacts.php"><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</a></li>
+
+        <div class="nav-divider"></div>
+
+        <li><a href="profile.php"><i class="fa-solid fa-user-circle"></i> My Profile</a></li>
+        <li><a href="logout.php" style="color:#eb5757;"><i class="fa-solid fa-door-open"></i> Sign Out</a></li>
+    </ul>
+</aside>
+
+<main class="main-content">
+    <header class="dashboard-header">
+        <h1>Order Fulfilment Center</h1>
+        <p>Track customer checkout orders, monitor fulfilment status, and review delivery details.</p>
+    </header>
+
+    <section class="orders-summary-row">
+        <div class="summary-box">
+            <div class="summary-info">
+                <h3>Volume Total</h3>
+                <p><?php echo $count_total; ?> Orders</p>
             </div>
-            
-            <ul class="nav-links">
-                <?php if ($user["role"] === "admin") { ?>
-                    <li><a href="admin_dashboard.php"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
-                <?php } ?>
-                <li><a href="home.php"><i class="fa-solid fa-house"></i> View Live Site</a></li>
-                
-                <div class="nav-divider"></div>
-
-                <li class="active"><a href="orders.php"><i class="fa-solid fa-box-archive"></i> Manage Orders</a></li>
-                
-                <?php if ($user["role"] === "admin") { ?>
-                    <li><a href="admin_payments.php"><i class="fa-solid fa-credit-card"></i> Payments Logs</a></li>
-                    <li><a href="admin_users.php"><i class="fa-solid fa-users-gear"></i> Manage Users</a></li>
-                    <li><a href="admin_bouquets.php"><i class="fa-solid fa-fleur-de-lis"></i> Bouquets Dept</a></li>
-                    <li><a href="admin_fashion.php"><i class="fa-solid fa-shirt"></i> Fashion Catalog</a></li>
-                    <li><a href="admin_decors.php"><i class="fa-solid fa-couch"></i> Decor Products</a></li>
-                    <li><a href="admin_contacts.php"><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</a></li>
-                <?php } else { ?>
-                    <li><a href="wishlist.php"><i class="fa-solid fa-heart"></i> My Wishlist</a></li>
-                    <li><a href="cart.php"><i class="fa-solid fa-cart-shopping"></i> Shopping Cart</a></li>
-                <?php } ?>
-                
-                <div class="nav-divider"></div>
-
-                <li><a href="profile.php"><i class="fa-solid fa-user-circle"></i> My Profile</a></li>
-                <li><a href="logout.php" style="color:#eb5757;"><i class="fa-solid fa-door-open"></i> Sign Out</a></li>
-            </ul>
+            <div class="summary-icon-box bg-purple">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
         </div>
-    </aside>
 
-    <main class="main-content">
-        
-        <header class="dashboard-header">
-            <h1>Order Fulfilment Center</h1>
-            <p>Track processing statuses, inspect target product IDs, and monitor gateway transaction parameters.</p>
-        </header>
+        <div class="summary-box">
+            <div class="summary-info">
+                <h3>Settled Orders</h3>
+                <p><?php echo $count_completed; ?> Success</p>
+            </div>
+            <div class="summary-icon-box bg-green">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
 
-        <section class="order-metrics-grid">
-            <div class="metric-mini-card">
-                <div class="metric-meta">
-                    <h3>Volume Total</h3>
+        <div class="summary-box">
+            <div class="summary-info">
+                <h3>In Pipeline</h3>
+                <p><?php echo $count_pending; ?> Pending</p>
+            </div>
+            <div class="summary-icon-box bg-orange">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="table-panel">
+        <h2>Active Checkout Order Logs</h2>
+
+        <?php if ($orders_result && $orders_result->num_rows > 0) { ?>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Details</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                <?php while ($row = $orders_result->fetch_assoc()) {
+                    $location_parts = array_filter([
+                        $row["region"] ?? "",
+                        $row["city"] ?? "",
+                        $row["area"] ?? ""
+                    ]);
+
+                    $location = !empty($location_parts)
+                        ? implode(", ", $location_parts)
+                        : "No address";
+
+                    $status_class = render_status_class($row["status"] ?? "");
+                ?>
+                    <tr>
+                        <td class="order-id">
+                            ORD-<?php echo str_pad($row["id"], 5, "0", STR_PAD_LEFT); ?>
+                        </td>
+
+                        <td>
+                            <div class="customer-name">
+                                <?php echo htmlspecialchars($row["customer_name"] ?? "Guest"); ?>
+                            </div>
+                            <div class="customer-address">
+                                <?php echo htmlspecialchars($location); ?>
+                            </div>
+                            <div class="customer-phone">
+                                <?php echo htmlspecialchars($row["phone_number"] ?? "N/A"); ?>
+                            </div>
+                        </td>
+
+                        <td>PID-<?php echo htmlspecialchars($row["product_id"] ?? "N/A"); ?></td>
+
+                        <td class="amount-text">
+                            Rs.<?php echo number_format((float)($row["amount"] ?? 0), 2); ?>
+                        </td>
+
+                        <td>
+                            <?php echo htmlspecialchars(strtoupper($row["payment_method"] ?? "N/A")); ?>
+                        </td>
+
+                        <td>
+                            <span class="status-badge <?php echo $status_class; ?>">
+                                <?php echo htmlspecialchars($row["status"] ?? "Unknown"); ?>
+                            </span>
+                        </td>
+
+                        <td style="color:var(--text-muted);">
+                            <?php echo !empty($row["created_at"]) ? date("M d, Y", strtotime($row["created_at"])) : "N/A"; ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        <?php } else { ?>
+            <div class="empty-state">
+                <i class="fa-solid fa-box-open"></i>
+                <p>No orders found.</p>
+            </div>
+        <?php } ?>
+    </section>
+</main>
+
+<?php } else { ?>
+
+<div class="user-shell">
+    <main class="user-main">
+
+        <div class="user-topbar">
+            <div class="user-brand">
+                <i class="fa-solid fa-bag-shopping"></i> DaisyHook
+            </div>
+
+            <div class="user-actions">
+                <a href="home.php">Shop</a>
+                <a href="profile.php">Profile</a>
+                <a href="logout.php" style="color:#eb5757;">Logout</a>
+            </div>
+        </div>
+
+        <section class="user-hero">
+            <h1>My Orders</h1>
+            <p>Hi <?php echo htmlspecialchars($user["name"] ?? "there"); ?>, here are only the orders connected to your account.</p>
+        </section>
+
+        <section class="orders-summary-row">
+            <div class="summary-box">
+                <div class="summary-info">
+                    <h3>Total Orders</h3>
                     <p><?php echo $count_total; ?></p>
                 </div>
-                <div class="icon-circle-wrapper cl-blue"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div class="summary-icon-box bg-purple">
+                    <i class="fa-solid fa-box"></i>
+                </div>
             </div>
-            <div class="metric-mini-card">
-                <div class="metric-meta">
-                    <h3>Settled orders</h3>
+
+            <div class="summary-box">
+                <div class="summary-info">
+                    <h3>Completed</h3>
                     <p><?php echo $count_completed; ?></p>
                 </div>
-                <div class="icon-circle-wrapper cl-green"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="summary-icon-box bg-green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
             </div>
-            <div class="metric-mini-card">
-                <div class="metric-meta">
-                    <h3>In Pipeline</h3>
+
+            <div class="summary-box">
+                <div class="summary-info">
+                    <h3>Pending</h3>
                     <p><?php echo $count_pending; ?></p>
                 </div>
-                <div class="icon-circle-wrapper cl-orange"><i class="fa-solid fa-spinner fa-spin-pulse"></i></div>
+                <div class="summary-icon-box bg-orange">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
             </div>
         </section>
 
-        <section class="table-panel">
-            <h2>Active Checkout Logs</h2>
+        <h2 class="user-orders-title">Order History</h2>
 
-            <?php if ($orders_result && $orders_result->num_rows > 0) { ?>
-                <table class="orders-table">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Customer Details</th> <!-- New Header -->
-            <th>Product Reference</th>
-            <th>Bill Amount</th>
-            <th>Payment Gateway</th>
-            <th>Status Condition</th>
-            <th>Creation Timestamp</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($row = $orders_result->fetch_assoc()) { 
-            /* ... (keep your existing badge logic here) ... */
-        ?>
-            <tr>
-                <td class="item-id">#ORD-<?php echo str_pad($row["id"], 5, "0", STR_PAD_LEFT); ?></td>
-                
-                <!-- New Customer Details Column -->
-                <td>
-                    <div style="font-weight:600; font-size:14px;"><?php echo htmlspecialchars($row["customer_name"] ?? 'N/A'); ?></div>
-                    <div style="font-size:12px; color:var(--text-muted);"><?php echo htmlspecialchars($row["address"] ?? 'No address'); ?></div>
-                    <div style="font-size:12px; color:var(--primary-accent);"><?php echo htmlspecialchars($row["phone_number"] ?? 'No phone'); ?></div>
-                </td>
+        <?php if ($orders_result && $orders_result->num_rows > 0) { ?>
+            <?php while ($row = $orders_result->fetch_assoc()) {
+                $status_class = render_status_class($row["status"] ?? "");
+            ?>
+                <div class="user-order-card">
+                    <div>
+                        <div class="order-id">
+                            ORD-<?php echo str_pad($row["id"], 5, "0", STR_PAD_LEFT); ?>
+                        </div>
+                        <div class="meta">
+                            Product: PID-<?php echo htmlspecialchars($row["product_id"] ?? "N/A"); ?>
+                            •
+                            <?php echo !empty($row["created_at"]) ? date("M d, Y", strtotime($row["created_at"])) : "N/A"; ?>
+                        </div>
+                    </div>
 
-                <td><span style="background:#f1f1f9; padding:4px 8px; border-radius:6px; font-size:14px; font-weight:600;">PID-<?php echo htmlspecialchars($row["product_id"]); ?></span></td>
-                <td class="price-tag">$<?php echo number_format((float)($row["amount"] ?? 0), 2); ?></td>
-                <td>
-                    <span style="font-weight: 500; color: #555;">
-                        <i class="fa-solid fa-credit-card" style="color:var(--text-muted); margin-right:6px; font-size:13px;"></i>
-                        <?php echo htmlspecialchars(strtoupper($row["payment_method"] ?? 'N/A')); ?>
-                    </span>
-                </td>
-                <td>
-                    <span class="status-pill <?php echo $badge_style; ?>">
-                        <i class="fa-solid fa-circle" style="font-size: 6px;"></i>
-                        <?php echo htmlspecialchars($row["status"] ?? 'Unknown'); ?>
-                    </span>
-                </td>
-                <td style="color: var(--text-muted); font-size: 14px;">
-                    <?php echo date("Y-m-d H:i", strtotime($row["created_at"])); ?>
-                </td>
-            </tr>
-        <?php } ?>
-    </tbody>
-</table>
-            <?php } else { ?>
-                <div class="empty-view">
-                    <i class="fa-solid fa-box-open"></i>
-                    <p>No recorded checkouts or purchases exist within the database entity parameters.</p>
+                    <div>
+                        <div class="amount">
+                            $<?php echo number_format((float)($row["amount"] ?? 0), 2); ?>
+                        </div>
+                        <div class="meta">
+                            Payment: <?php echo htmlspecialchars(strtoupper($row["payment_method"] ?? "N/A")); ?>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="status-badge <?php echo $status_class; ?>">
+                            <?php echo htmlspecialchars($row["status"] ?? "Unknown"); ?>
+                        </span>
+                    </div>
                 </div>
             <?php } ?>
-        </section>
+        <?php } else { ?>
+            <div class="empty-state">
+                <i class="fa-solid fa-box-open"></i>
+                <p>You have not placed any orders yet.</p>
+            </div>
+        <?php } ?>
 
     </main>
+</div>
+
+<?php } ?>
 
 </body>
 </html>

@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST["email"]);
     $password = trim($_POST["password"]);
 
-    // ================= VALIDATION =================
+    // VALIDATION
 
     // Check empty fields
     if (empty($name) || empty($email) || empty($password)) {
@@ -100,7 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         body{
             min-height:100vh;
-            background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+            /* background:linear-gradient(135deg,#ff9a9e,#fad0c4); */
+            background: linear-gradient(135deg, #fcfdfe, #e1ecff);
+
         }
 
         .page-wrapper{
@@ -113,8 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .register-box{
             width:100%;
-            max-width:400px;
-            background:white;
+            max-width:600px;
+            background:whitesmoke;
             padding:30px;
             border-radius:12px;
             box-shadow:0 10px 30px rgba(0,0,0,0.2);
@@ -232,10 +234,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <form method="POST">
-
-            <!-- NAME -->
             <div class="input-group">
-
                 <input 
                     type="text"
                     name="name"
@@ -243,23 +242,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     required
                     pattern="[A-Za-z ]+"
                     title="Name should contain only letters">
-
             </div>
-
-            <!-- EMAIL -->
             <div class="input-group">
-
                 <input 
                     type="email"
                     name="email"
                     placeholder="Email"
                     required>
-
             </div>
-
-            <!-- PASSWORD -->
             <div class="input-group password-box">
-
                 <input 
                     type="password"
                     name="password"
@@ -271,27 +262,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <i class="fa-solid fa-eye-slash"
                    onclick="togglePassword(this)"></i>
-
             </div>
-
-            <!-- TERMS -->
             <div class="terms">
-
                 <label>
                     <input type="checkbox" name="terms">
-
-                    I agree to
-                    <a href="#">Terms & Conditions</a>
-
+                    I agree to <a href="#">Terms & Conditions</a>
                 </label>
-
             </div>
-
-            <!-- BUTTON -->
             <button type="submit">
                 Register
             </button>
-
         </form>
 
         <div class="bottom-text">

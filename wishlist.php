@@ -75,90 +75,109 @@ $result = $stmt->get_result();
     <link rel="stylesheet" href="/crochet/navbar.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f5f2;
-            margin: 0;
-        }
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f5f2;
+    margin: 0;
+}
 
-        .wishlist-section {
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 20px;
-            min-height: 60vh;
-        }
+.wishlist-section {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+    min-height: 60vh;
+}
 
-        .wishlist-section h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            /* color: #7a4e3a; */
-            color: #fbf9f8;
-            
-        }
+.wishlist-section h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #fbf9f8;
+}
 
-        .wishlist-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 25px;
-        }
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+    align-items: stretch;
+}
 
-        .wishlist-card {
-            background: white;
-            padding: 15px;
-            border-radius: 16px;
-            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
-            text-align: center;
-        }
+.wishlist-card {
+    background: white;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+    text-align: center;
+    min-height: 430px;
 
-        .wishlist-card img {
-            width: 100%;
-            height: 190px;
-            object-fit: cover;
-            border-radius: 12px;
-        }
+    display: flex;
+    flex-direction: column;
+}
 
-        .wishlist-card h3 {
-            margin: 12px 0 8px;
-            color: #333;
-        }
-        a, h3{
-            text-decoration:none;
-        }
-        .wishlist-card p {
-            color: #555;
-            margin-bottom: 10px;
-        }
+.wishlist-card a {
+    text-decoration: none;
+    /* color: inherit; */
+    color:white;
+}
 
-        .wishlist-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
+.wishlist-card img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    border-radius: 12px;
+}
 
-        .add-btn,
-        .remove-btn {
-            padding: 9px 14px;
-            border-radius: 8px;
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
+.wishlist-card h3 {
+    margin: 12px 0 8px;
+    color: #333;
+    min-height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .add-btn {
-            background: #7a4e3a;
-        }
+.wishlist-card p {
+    color: #555;
+    margin-bottom: 10px;
+}
 
-        .remove-btn {
-            background: #e91e63;
-        }
+.wishlist-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 15px;
+}
 
-        .empty {
-            text-align: center;
-            font-size: 18px;
-            color: #777;
-        }
+.add-btn,
+.remove-btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    
+}
+
+.add-btn {
+    background: #b3775b;
+}
+
+.remove-btn {
+    background: #ef3573;
+}
+
+.empty {
+    text-align: center;
+    font-size: 18px;
+    color: #777;
+}
     </style>
 </head>
 <body>
@@ -167,6 +186,7 @@ $result = $stmt->get_result();
 
 <section class="wishlist-section">
     <h1>My Wishlist</h1>
+            
 
     <?php if ($result->num_rows > 0): ?>
         <div class="wishlist-grid">

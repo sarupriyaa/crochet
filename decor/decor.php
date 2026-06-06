@@ -12,7 +12,6 @@ if (!isset($_GET['id'])) {
 
 $id = intval($_GET['id']);
 
-/* Product query matching decors table schema */
 $stmt = $conn->prepare("SELECT * FROM decors WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -23,22 +22,28 @@ if (!$product) {
     exit();
 }
 
-/* Related items filtered by category */
-$related = $conn->prepare(
-    "SELECT id, title, decoration, price 
-     FROM decors
-     WHERE category = ? AND id != ?
-     ORDER BY RAND() LIMIT 10"
-);
-
 $category = $product['category'] ?? '';
+
+$related = $conn->prepare("
+    SELECT id, title, decoration, price 
+    FROM decors
+    WHERE category = ? AND id != ?
+    ORDER BY RAND()
+    LIMIT 10
+");
 $related->bind_param("si", $category, $id);
 $related->execute();
 $relatedResult = $related->get_result();
+
+$mainImage = trim($product['decoration'] ?? '');
+$mainFile = __DIR__ . "/../decoration/" . $mainImage;
+$mainSrc = "../decoration/" . $mainImage;
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title><?php echo htmlspecialchars($product['title']); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -47,28 +52,7 @@ $relatedResult = $related->get_result();
     <link rel="stylesheet" href="../footer.css">
     <link rel="stylesheet" href="../navbar.css">
     <link rel="stylesheet" href="../search/search.css">
-
-    <style>
-        a { text-decoration: none; }
-        h4 { min-height: 50px; }
-        .category { color: #777; font-size: 14px; margin-bottom: 10px; }
-        .action-links { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
-
-        /* Quantity Form Elements */
-        .quantity-box { margin-top: 20px; display: flex; align-items: center; gap: 12px; }
-        .quantity-box label { font-size: 18px; font-weight: 600; color: #333; }
-        .quantity-box input { width: 90px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; outline: none; }
-        .quantity-box input:focus { border-color: #e91e63; }
-
-        .cart-btn { background: #ff6b6b; border: none; padding: 12px 22px; border-radius: 8px; cursor: pointer; color: white; font-size: 16px; }
-        .cart-btn:hover { background: #ff4f4f; }
-        .wishlist-btn { background: #e91e63; border: none; padding: 12px 22px; border-radius: 8px; cursor: pointer; color: white; font-size: 16px; }
-        .wishlist-btn:hover { background: #d81b60; }
-        .wishlist-btn a { color: white; }
-        .buy { background: #2ecc71; border: none; padding: 12px 22px; border-radius: 8px; cursor: pointer; color: white; font-size: 16px; font-weight: bold; }
-        .buy:hover { background: #27ae60; }
-    </style>
-</head>
+    </head>
 
 <body>
 
@@ -78,12 +62,6 @@ $relatedResult = $related->get_result();
     <div class="product-container">
 
         <div class="product-image">
-            <?php
-            $mainImage = isset($product['decoration']) ? trim($product['decoration']) : '';
-            $mainFile = __DIR__ . "/../decoration/" . $mainImage;
-            $mainSrc  = "../decoration/" . $mainImage;
-            ?>
-
             <?php if (!empty($mainImage) && file_exists($mainFile)): ?>
                 <img src="<?php echo htmlspecialchars($mainSrc); ?>" alt="Decor">
             <?php else: ?>
@@ -94,17 +72,19 @@ $relatedResult = $related->get_result();
         <div class="product-details">
             <h2><?php echo htmlspecialchars($product['title']); ?></h2>
 
-            <p class="category">
+            <p class="description">
                 Category: <?php echo htmlspecialchars($product['category'] ?? 'N/A'); ?>
             </p>
 
-            <p class="price">Rs <?php echo htmlspecialchars($product['price']); ?></p>
+            <p class="price">
+                Rs <?php echo htmlspecialchars($product['price']); ?>
+            </p>
 
             <p class="description">
                 <?php echo htmlspecialchars($product['description']); ?>
             </p>
 
-            <form id="purchaseForm" method="GET">
+            <form method="GET">
                 <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
                 <input type="hidden" name="type" value="decor">
 
@@ -114,17 +94,45 @@ $relatedResult = $related->get_result();
                 </div>
 
                 <div class="action-links">
+
                     <?php if (!isset($_SESSION["user_id"])): ?>
-                        <button type="button" class="cart-btn" onclick="location.href='/crochet/login.php'">Add to Cart</button>
-                        <button type="button" class="wishlist-btn" onclick="location.href='/crochet/login.php'">❤️ Add to Wishlist</button>
-                        <button type="button" class="buy" onclick="location.href='/crochet/login.php'">Buy Now</button>
-                    <?php else: ?>
-                        <button type="submit" formaction="/crochet/add_to_cart.php" class="cart-btn">Add to Cart</button>
-                        <button type="button" class="wishlist-btn">
-                            <a href="/crochet/add_to_wishlist.php?id=<?php echo $product['id']; ?>&type=decor">❤️ Add to Wishlist</a>
+
+                        <button type="button" class="cart-btn" onclick="location.href='/crochet/login.php'">
+                            Add to Cart
                         </button>
-                        <button type="submit" formaction="/crochet/payment.php" class="buy">Buy Now</button>
+
+                        <button type="button" class="wishlist-btn" onclick="location.href='/crochet/login.php'">
+                            ❤️ Add to Wishlist
+                        </button>
+
+                        <button type="button" class="buy" onclick="location.href='/crochet/login.php'">
+                            Buy Now
+                        </button>
+
+                    <?php elseif (isset($_SESSION["role"]) && $_SESSION["role"] === "admin"): ?>
+
+                        <!-- <button type="button" class="cart-btn" disabled>
+                            Admin View Only
+                        </button> -->
+
+                    <?php else: ?>
+
+                        <button type="submit" formaction="/crochet/add_to_cart.php" class="cart-btn">
+                            Add to Cart
+                        </button>
+
+                        <button type="button" class="wishlist-btn">
+                            <a href="/crochet/add_to_wishlist.php?id=<?php echo $product['id']; ?>&type=decor">
+                                ❤️ Add to Wishlist
+                            </a>
+                        </button>
+
+                        <button type="submit" formaction="/crochet/payment.php" class="buy">
+                            Buy Now
+                        </button>
+
                     <?php endif; ?>
+
                 </div>
             </form>
         </div>
@@ -138,27 +146,32 @@ $relatedResult = $related->get_result();
     <h3>You may also like</h3>
 
     <div class="related-grid">
-        <?php while($row = $relatedResult->fetch_assoc()): ?>
+        <?php while ($row = $relatedResult->fetch_assoc()): ?>
+
+            <?php
+            $relatedImage = trim($row['decoration'] ?? '');
+            $relatedFile = __DIR__ . "/../decoration/" . $relatedImage;
+            $relatedSrc = "../decoration/" . $relatedImage;
+            ?>
+
             <div class="related-card">
                 <a href="decor.php?id=<?php echo $row['id']; ?>">
 
-                    <?php
-                    $relatedImage = isset($row['decoration']) ? trim($row['decoration']) : '';
-                    $relatedFile = __DIR__ . "/../decoration/" . $relatedImage;
-                    $relatedSrc  = "../decoration/" . $relatedImage;
-                    ?>
-
                     <?php if (!empty($relatedImage) && file_exists($relatedFile)): ?>
-                        <img src="<?php echo htmlspecialchars($relatedSrc); ?>" alt="Related">
+                        <img src="<?php echo htmlspecialchars($relatedSrc); ?>" alt="Related Decor">
                     <?php else: ?>
                         <img src="../decoration/default.png" alt="No Image">
                     <?php endif; ?>
 
                     <h4><?php echo htmlspecialchars($row['title']); ?></h4>
-                    <p class="price">Rs <?php echo htmlspecialchars($row['price']); ?></p>
+
+                    <p class="price">
+                        Rs <?php echo htmlspecialchars($row['price']); ?>
+                    </p>
 
                 </a>
             </div>
+
         <?php endwhile; ?>
     </div>
 </section>

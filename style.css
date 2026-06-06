@@ -132,11 +132,14 @@ html {
 
 /* INSTAGRAM SECTION */
 .content {
-    background: #e5e4e4;
+    /* background: #e5e4e4; */
     padding: 80px 20px;
     text-align: center;
     min-height: 70vh;
     animation: fadeIn 1.2s ease;
+    /* background: #fae7e7; */
+        background: linear-gradient(135deg, #faf2f2 0%, #fadbdb 100%);
+
 }
 
 .head3 {
@@ -274,11 +277,13 @@ p>a:hover {
     margin: 60px auto;
     padding: 50px;
     text-align: center;
-    background: #dfe5eb;
+    /* background: #dfe5eb; */
     /* background: #f5f6f7; */
     min-height: 60vh;
     border-radius: 24px;
     animation: fadeInUp 1s ease;
+        background: linear-gradient(180deg, #ecf2f7 0%, #dcedf8 100%);
+
 }
 
 .handcraft h3 {

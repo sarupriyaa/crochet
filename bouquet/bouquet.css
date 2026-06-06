@@ -1,4 +1,8 @@
-/* ===== BOUQUET PAGE ===== */
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 .bouquet-section {
     padding: 60px 20px;
@@ -51,8 +55,6 @@
     font-size: 18px;
     margin-top: 10px;
 }
-
-/* ===== SINGLE PRODUCT PAGE ===== */
 
 .single-product {
     width: 80%;
@@ -182,10 +184,9 @@ hr {
 
 .double-product h3 {
     margin-bottom: 20px;
-    color: aliceblue;
+    color: black;
 }
 
-/* HORIZONTAL RELATED PRODUCTS */
 .related-grid {
     display: flex;
     gap: 20px;
@@ -223,14 +224,14 @@ hr {
 .related-card h4 {
     font-size: 16px;
     margin: 8px 0;
+    text-decoration: none;
 }
 
 .related-card .price {
     color: #e91e63;
     font-weight: bold;
+    text-decoration: none;
 }
-
-/* RESPONSIVE DESIGN */
 
 @media (max-width: 992px) {
     .product-container {
@@ -299,4 +300,41 @@ hr {
     .double-product {
         width: 90%;
     }
+} 
+a {
+    text-decoration:none;
+}
+
+h4 {
+    min-height:50px;
+}
+
+.action-links {
+    display:flex;
+    gap:15px;
+    margin-top:20px;
+    flex-wrap:wrap;
+}
+
+.quantity-box{
+    margin-top:20px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.quantity-box label{
+    font-size:18px;
+    font-weight:600;
+    color:#333;
+}
+.quantity-box input{
+    width:90px;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+    outline:none;
+}
+.quantity-box input:focus{
+    border-color:#e91e63;
 }

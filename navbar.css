@@ -1,6 +1,8 @@
- /* =========================
-   TOP HEADER
-========================= */
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 .top-header {
     width: 100%;
     background: #f8f5f7;
@@ -21,8 +23,9 @@
     text-decoration: none;
     font-size: 38px;
     font-weight: 700;
-    color: #a14f73;
+    /* color: #a14f73; */
     letter-spacing: 1px;
+    color: #000080;
 }
 
 .top-search {
@@ -107,9 +110,6 @@
     opacity: 0.9;
 }
 
-/* =========================
-   NAVBAR
-========================= */
 .navbar {
     width: 100%;
     background: #fff;
@@ -166,9 +166,6 @@
     background: #cf3f75;
 }
 
-/* =========================
-   DROPDOWN
-========================= */
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -202,9 +199,6 @@
     display: block;
 }
 
-/* =========================
-   HAMBURGER
-========================= */
 .hamburger {
     display: none;
     font-size: 28px;
@@ -212,9 +206,6 @@
     color: #333;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
 @media (max-width: 992px) {
     .top-header-inner {
         grid-template-columns: 1fr;

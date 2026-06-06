@@ -27,10 +27,10 @@
 
 <div class="about-text">
 
-<h1>About SnuggleStitch</h1>
+<h1>About DaisyHook</h1>
 
 <p>
-SnuggleStitch is a handmade crochet brand dedicated to creating 
+DaisyHook is a handmade crochet brand dedicated to creating 
 beautiful and cozy products that bring warmth and joy to everyday life. 
 Each piece is carefully crafted with love, patience, and creativity.
 </p>

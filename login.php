@@ -71,7 +71,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         body{
             min-height:100vh;
-            background:linear-gradient(135deg,#ff7e5f,#feb47b);
+            /* background:linear-gradient(135deg,#ff7e5f,#feb47b); */
+            background: linear-gradient(135deg, #fcfdfe, #e1ecff);
+
         }
 
         .container{
@@ -81,12 +83,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .login-box{
             width:50%;
             margin:auto;
-            background:rgba(255,255,255,0.15);
+            /* background:rgba(255,255,255,0.15); */
             backdrop-filter:blur(10px);
             border-radius:12px;
             padding:50px;
             box-shadow:0 10px 30px rgba(0,0,0,0.2);
             color:white;
+            background:whitesmoke;
         }
 
         .login-box h2{
@@ -102,6 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .input-group label{
             display:block;
             margin-bottom:6px;
+            color:black;
         }
 
         .input-group input{
@@ -143,10 +147,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .bottom-text{
             text-align:center;
             margin-top:20px;
+            color:black;
         }
 
         .bottom-text a{
-            color:white;
+            color:blue;
             font-weight:bold;
         }
 

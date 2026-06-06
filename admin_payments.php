@@ -25,13 +25,14 @@ if (!$user || $user["role"] !== "admin") {
 }
 
 /* 3. Aggregate Payment Summaries dynamically */
-$sum_result = $conn->query("SELECT SUM(amount) AS gross, COUNT(id) as total_tx FROM orders WHERE LOWER(status) IN ('success', 'completed', 'paid')");
+// Changed status filter to catch all records and display Rs.
+$sum_result = $conn->query("SELECT SUM(amount) AS gross, COUNT(id) as total_tx FROM orders WHERE status IS NOT NULL");
 $sum_row = $sum_result->fetch_assoc();
-$gross_revenue = "$" . number_format((float)($sum_row['gross'] ?? 0), 2);
+$gross_revenue = "Rs. " . number_format((float)($sum_row['gross'] ?? 0), 2);
 $total_transactions = $sum_row['total_tx'] ?? 0;
 
 /* 4. Query transactions rows matching schema structure precisely */
-$payments_query = "SELECT id, product_id, amount, payment_method, status, created_at, customer_name, address, phone_number FROM orders ORDER BY id DESC";
+$payments_query = "SELECT id, product_id, amount, payment_method, status, created_at, customer_name, region, city, area, phone_number FROM orders ORDER BY id DESC";
 $payments_result = $conn->query($payments_query);
 ?>
 <!DOCTYPE html>
@@ -68,7 +69,6 @@ $payments_result = $conn->query($payments_query);
             min-height: 100vh;
         }
 
-        /* --- DASHBOARD SIDEBAR --- */
         .sidebar {
             width: 260px;
             background: var(--sidebar-bg);
@@ -139,7 +139,6 @@ $payments_result = $conn->query($payments_query);
             margin: 15px 0;
         }
 
-        /* --- MAIN VIEWPORT PANEL --- */
         .main-content {
             margin-left: 260px;
             flex-grow: 1;
@@ -162,7 +161,6 @@ $payments_result = $conn->query($payments_query);
             color: var(--text-muted);
         }
 
-        /* Top Analytical Cards Section Row */
         .payments-summary-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -208,7 +206,6 @@ $payments_result = $conn->query($payments_query);
         .bg-purple { background: rgba(99, 91, 255, 0.1); color: var(--primary-accent); }
         .bg-green { background: rgba(41, 204, 151, 0.1); color: #29cc97; }
 
-        /* Data Panel Workspace Layout */
         .table-panel {
             background: var(--card-bg);
             border-radius: 20px;
@@ -251,7 +248,6 @@ $payments_result = $conn->query($payments_query);
             border-bottom: none;
         }
 
-        /* Contextual Status Badge Pill Containers */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -339,6 +335,7 @@ $payments_result = $conn->query($payments_query);
                 </div>
                 <div class="summary-icon-box bg-green"><i class="fa-solid fa-money-bill-trend-up"></i></div>
             </div>
+
             <div class="summary-box">
                 <div class="summary-info">
                     <h3>Settled Sales</h3>
@@ -353,24 +350,78 @@ $payments_result = $conn->query($payments_query);
 
             <?php if ($payments_result && $payments_result->num_rows > 0) { ?>
                 <table class="orders-table">
-                    <thead><tr><th>TX ID</th><th>Customer Details</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>TX ID</th>
+                            <th>Customer Details</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
                     <tbody>
                         <?php while ($row = $payments_result->fetch_assoc()) { 
                             $status_clean = strtolower(trim($row["status"] ?? ''));
-                            $status_class = ($status_clean === "success" || $status_clean === "paid") ? "status-success" : (($status_clean === "pending") ? "status-pending" : "status-default");
+
+                            $status_class = ($status_clean === "success" || $status_clean === "paid" || $status_clean === "completed") 
+                                ? "status-success" 
+                                : (($status_clean === "pending" || $status_clean === "processing") 
+                                    ? "status-pending" 
+                                    : (($status_clean === "failed" || $status_clean === "cancelled" || $status_clean === "canceled")
+                                        ? "status-failed"
+                                        : "status-default"));
+
+                            $location_parts = array_filter([
+                                $row["region"] ?? "",
+                                $row["city"] ?? "",
+                                $row["area"] ?? ""
+                            ]);
+
+                            $customer_location = !empty($location_parts)
+                                ? implode(", ", $location_parts)
+                                : "No address";
                         ?>
+
                             <tr>
-                                <td style="font-weight:700;">TXN-<?php echo str_pad($row["id"], 5, "0", STR_PAD_LEFT); ?></td>
-                                <td>
-                                    <div style="font-weight:600;"><?php echo htmlspecialchars($row["customer_name"] ?? 'N/A'); ?></div>
-                                    <div style="font-size:12px; color:var(--text-muted);"><?php echo htmlspecialchars($row["address"] ?? 'No address'); ?></div>
-                                    <div style="font-size:12px; color:var(--primary-accent);"><?php echo htmlspecialchars($row["phone_number"] ?? 'No phone'); ?></div>
+                                <td style="font-weight:700;">
+                                    TXN-<?php echo str_pad($row["id"], 5, "0", STR_PAD_LEFT); ?>
                                 </td>
-                                <td style="font-weight:600;">$<?php echo number_format((float)$row["amount"], 2); ?></td>
-                                <td><?php echo htmlspecialchars(strtoupper($row["payment_method"] ?? 'N/A')); ?></td>
-                                <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($row["status"] ?? 'Unknown'); ?></span></td>
-                                <td style="color:var(--text-muted);"><?php echo date("M d, Y", strtotime($row["created_at"])); ?></td>
+
+                                <td>
+                                    <div style="font-weight:600;">
+                                        <?php echo htmlspecialchars($row["customer_name"] ?? 'N/A'); ?>
+                                    </div>
+
+                                    <div style="font-size:12px; color:var(--text-muted);">
+                                        <?php echo htmlspecialchars($customer_location); ?>
+                                    </div>
+
+                                    <div style="font-size:12px; color:var(--primary-accent);">
+                                        <?php echo htmlspecialchars($row["phone_number"] ?? 'No phone'); ?>
+                                    </div>
+                                </td>
+
+                                <td style="font-weight:600;">
+                                    Rs. <?php echo number_format((float)$row["amount"], 2); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars(strtoupper($row["payment_method"] ?? 'N/A')); ?>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge <?php echo $status_class; ?>">
+                                        <?php echo htmlspecialchars($row["status"] ?? 'Unknown'); ?>
+                                    </span>
+                                </td>
+
+                                <td style="color:var(--text-muted);">
+                                    <?php echo date("M d, Y", strtotime($row["created_at"])); ?>
+                                </td>
                             </tr>
+
                         <?php } ?>
                     </tbody>
                 </table>

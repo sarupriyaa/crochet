@@ -75,19 +75,19 @@ $result = $stmt->get_result();
             </div>
 
             <nav class="space-y-1">
-                <a href="dashboard.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
+                <a href="admin_dashboard.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
                     <i class="fa-solid fa-compass text-lg w-5 text-center"></i> Overview
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
+                <a href="home.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
                     <i class="fa-solid fa-house text-lg w-5 text-center"></i> View Live Site
                 </a>
                 
                 <div class="border-t border-slate-100 my-4"></div>
 
-                <a href="admin_orders.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
+                <a href="orders.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
                     <i class="fa-solid fa-box text-lg w-5 text-center"></i> Manage Orders
                 </a>
-                <a href="payments.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
+                <a href="admin_payments.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
                     <i class="fa-solid fa-credit-card text-lg w-5 text-center"></i> Payments Logs
                 </a>
                 <a href="admin_users.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
