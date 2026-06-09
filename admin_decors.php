@@ -121,7 +121,7 @@ if (isset($_GET['edit_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Decor Department Catalog - SuperDash</title>
-
+<link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -458,7 +458,7 @@ if (isset($_GET['edit_id'])) {
                 <li><a href="orders.php"><i class="fa-solid fa-box-archive"></i> Manage Orders</a></li>
                 <li><a href="admin_payments.php"><i class="fa-solid fa-credit-card"></i> Payments Logs</a></li>
                 <li><a href="admin_users.php"><i class="fa-solid fa-users-gear"></i> Manage Users</a></li>
-                <li><a href="admin_bouquets.php"><i class="fa-solid fa-fleur-de-lis"></i> Bouquets Dept</a></li>
+                <li><a href="admin_bouquets.php"><i class="fi fi-ss-daisy-alt"></i> Bouquets Dept</a></li>
                 <li><a href="admin_fashion.php"><i class="fa-solid fa-shirt"></i> Fashion Catalog</a></li>
                 <li class="active"><a href="admin_decors.php"><i class="fa-solid fa-couch"></i> Decor Products</a></li>
                 <li><a href="admin_contacts.php"><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</a></li>

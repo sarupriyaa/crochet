@@ -34,10 +34,13 @@
     font-size:75px;
     color:#222;
     margin-bottom:15px;
+  font-family: Brush Script MT;
 }
 
 .hero-left h1 span{
     color:#e91e63;
+      font-family: Brush Script MT;
+
 }
 
 .hero-left h2{
@@ -107,6 +110,12 @@
 }
 
 }
+/* Cart Drawer */
+/* .cart-drawer { position: fixed; right: -400px; top: 0; width: 350px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: 0.4s ease; z-index: 9999; padding: 20px; }
+.cart-drawer.active { right: 0; }
+.item-image-wrapper { position: relative; width: 100px; height: 100px; overflow: hidden; }
+.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; }
+.item-image-wrapper:hover .overlay { display: flex; } */
     </style>
 </head>
 <body>
@@ -124,9 +133,7 @@
             creativity and elegance for every special moment.
         </p>
 
-        <button class="hero-btn">
-            SHOP NOW
-        </button>
+<button class="hero-btn" onclick="loadShop()">SHOP NOW</button>
     </div>
 
     <div class="hero-right">
@@ -134,9 +141,25 @@
          <!-- <img src="https://i.pinimg.com/1200x/85/76/81/857681d5be5af9035204ee42b84b47bc.jpg" alt=""> -->
           <img src="https://i.pinimg.com/1200x/2b/85/a4/2b85a4a74b91cd0b869f59c96ad85fae.jpg" alt="">
     </div>
+</div>
+</div>
+<div id="shop-container"></div>
 
-</div></div>
+    <!-- <div id="cart-drawer" class="cart-drawer">
+        <h3>Your Cart</h3>
+        <button onclick="toggleCart()" style="cursor:pointer;">Close</button>
+        <div class="cart-items" style="margin-top: 20px;">
+            <div class="item-image-wrapper">
+                <img src="https://i.pinimg.com/474x/36/0c/ae/360cae286ce76ce887ba49d6c586694b.jpg" alt="Item">
+                <div class="overlay">
+                    <button onclick="window.location.href='details.php'">View Details</button>
+                </div>
+            </div>
+        </div>
 
+    </div> -->
+
+    
 <div class="container">
     <div class="content">
         <h2 class="head3">Follow us on instagram</h2>
@@ -167,8 +190,9 @@
 <div class="shop">
     <div class="title1">
         <h3>Shop Our Top Sellers</h3>
-        <button class="button2">SHOP NOW</button>
+        <button class="button2" onclick="topsell()">SHOP NOW</button>
     </div>
+      <div id="shop-container"></div>
     <div class="title2">
         <img src="https://www.blingcute.com/cdn/shop/files/O1CN01a1uZqF1vbz8m6pYvB__2328716192_1024x1024.jpg?v=1638431507" alt="">
     </div>
@@ -215,6 +239,28 @@
     <p>100% Handmade Crochet</p>
 </div> -->
 <?php include "footer.php";?>
+<script>
+        // Toggle Cart Drawer
+        function toggleCart() {
+            document.getElementById("cart-drawer").classList.toggle("active");
+        }
+
+        // Fetch and show Shop Slider
+        function loadShop() {
+            const container = document.getElementById('shop-container');
+            if(container.innerHTML !== "") {
+                container.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            fetch('shop.php')
+                .then(response => response.text())
+                .then(data => {
+                    container.innerHTML = data;
+                    container.scrollIntoView({ behavior: 'smooth' });
+                });
+        }
+    </script>
+
 <!-- <p>    © 2026 Love Crochet | All Rights Reserved</p> -->
 </body>
 </html>

@@ -66,7 +66,7 @@ function render_status_class($status) {
 <head>
 <meta charset="UTF-8">
 <title>Manage Orders - DaisyHook</title>
-
+<link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
@@ -365,7 +365,6 @@ body {
     font-size: 18px;
     font-weight: 700;
 }
-
 @media(max-width: 900px) {
     body {
         flex-direction: column;
@@ -412,7 +411,7 @@ body {
         <li class="active"><a href="orders.php"><i class="fa-solid fa-box-archive"></i> Manage Orders</a></li>
         <li><a href="admin_payments.php"><i class="fa-solid fa-credit-card"></i> Payments Logs</a></li>
         <li><a href="admin_users.php"><i class="fa-solid fa-users-gear"></i> Manage Users</a></li>
-        <li><a href="admin_bouquets.php"><i class="fa-solid fa-fleur-de-lis"></i> Bouquets Dept</a></li>
+        <li><a href="admin_bouquets.php"><i class="fi fi-ss-daisy-alt"></i> Bouquets Dept</a></li>
         <li><a href="admin_fashion.php"><i class="fa-solid fa-shirt"></i> Fashion Catalog</a></li>
         <li><a href="admin_decors.php"><i class="fa-solid fa-couch"></i> Decor Products</a></li>
         <li><a href="admin_contacts.php"><i class="fa-solid fa-envelope-open-text"></i> Contact Messages</a></li>
@@ -474,7 +473,7 @@ body {
                         <th>Product</th>
                         <th>Amount</th>
                         <th>Method</th>
-                        <th>Status</th>
+                        <!-- <th>Status</th> -->
                         <th>Date</th>
                     </tr>
                 </thead>
@@ -491,7 +490,7 @@ body {
                         ? implode(", ", $location_parts)
                         : "No address";
 
-                    $status_class = render_status_class($row["status"] ?? "");
+                    // $status_class = render_status_class($row["status"] ?? "");
                 ?>
                     <tr>
                         <td class="order-id">
@@ -520,11 +519,11 @@ body {
                             <?php echo htmlspecialchars(strtoupper($row["payment_method"] ?? "N/A")); ?>
                         </td>
 
-                        <td>
+                        <!-- <td>
                             <span class="status-badge <?php echo $status_class; ?>">
                                 <?php echo htmlspecialchars($row["status"] ?? "Unknown"); ?>
                             </span>
-                        </td>
+                        </td> -->
 
                         <td style="color:var(--text-muted);">
                             <?php echo !empty($row["created_at"]) ? date("M d, Y", strtotime($row["created_at"])) : "N/A"; ?>

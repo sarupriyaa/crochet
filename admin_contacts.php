@@ -56,6 +56,7 @@ $result = $stmt->get_result();
     <title>Contact Messages Department - DaisyHook</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css'>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
     </style>
@@ -94,7 +95,7 @@ $result = $stmt->get_result();
                     <i class="fa-solid fa-users text-lg w-5 text-center"></i> Manage Users
                 </a>
                 <a href="admin_bouquets.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
-                    Bouquets Dept
+                   <i class="fi fi-ss-daisy-alt"></i> Bouquets Dept
                 </a>
 
                 <a href="admin_fashion.php" class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium rounded-xl hover:bg-slate-50 transition-colors">
